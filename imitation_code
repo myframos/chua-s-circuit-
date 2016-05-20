@@ -1,0 +1,40 @@
+import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt 
+
+###############################################
+def Nlfunction(V_1):
+    Ga=-0.00076
+    Gb=-0.00049
+    E=15.0
+    retg=Gb*V_1+(Gb-Ga)/2*(abs(V_1-E)-abs(V_1+E))
+    return retg
+
+###############################################
+
+def delta(y,t):
+    global R
+    C1=9.91e-9
+    C2=98.2e-9
+    l=23e-3
+    G=1/R
+    ret_delta =np.array([(G*(y[1]-y[0])-Nlfunction(y[0]))/C1,
+                         (G*(y[0]-y[1])+y[2])/C2,
+                         -y[1]/l])
+    return ret_delta
+
+################################################
+
+time=np.linspace(0,0.2,10000)
+r=range(1930,1960,1)
+yinit=np.array([0.0,0.0,0.1])
+global R
+for R in r:
+    y = odeint(delta,yinit,time)
+    plt.figure()
+    plt.plot(y[1000:,0],y[1000:,1])
+    plt.xlabel('U_1')
+    plt.ylabel('U_2')
+    plt.legend()
+    plt.savefig('%domega'%R)
+    plt.clf()
